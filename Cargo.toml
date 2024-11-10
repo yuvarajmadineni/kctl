@@ -1,0 +1,10 @@
+[package]
+name = "kctl"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.20", features = ["derive"] }
+rdkafka = { version = "0.25", features = ["cmake-build"] }
+openssl = "0.10.68"
+tokio = { version = "1", features = ["full"] }
