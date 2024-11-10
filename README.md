@@ -1,6 +1,6 @@
 # kctl
 
-A simple cli utility for working with kafka. This project a work in progress,created to improve my rust knowledge.
+A simple cli utility for working with kafka. This project is a work in progress,created to improve my rust knowledge.
 
 ## Features
 - Create Topic
