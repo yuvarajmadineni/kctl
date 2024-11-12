@@ -10,3 +10,7 @@ A simple cli utility for working with kafka. This project is a work in progress,
 - List Topics
 
     ``` cargo run list topics ```
+
+- Delete Topics
+
+    ``` cargo run delete topic <TOPIC> ```
