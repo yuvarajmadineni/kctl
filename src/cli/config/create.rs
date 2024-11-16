@@ -11,13 +11,25 @@ pub struct CreateTopicCommand {
     pub replication_factor: i32,
 }
 
+#[derive(Parser, Debug)]
+pub struct CreateConsumerGroupCommand {
+    pub name: String,
+    pub topics: Vec<String>,
+}
+
 #[derive(Debug, Subcommand)]
-pub enum CreateTopicCommands {
+pub enum CreateCommands {
     Topic(CreateTopicCommand),
+    ConsumerGroup(CreateConsumerGroupCommand),
+}
+
+#[derive(Debug, Subcommand)]
+pub enum CreateConsumerGroupCommands {
+    Topic(CreateConsumerGroupCommand),
 }
 
 #[derive(Debug, Args)]
 pub struct CreateCommand {
     #[command(subcommand)]
-    pub creat_topic_cmd: CreateTopicCommands,
+    pub create_cmd: CreateCommands,
 }

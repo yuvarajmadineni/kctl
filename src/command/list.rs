@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use crate::admin_kafka;
 
-pub async fn list_topics() -> Vec<String> {
+pub async fn list_topics() {
     let consumer: BaseConsumer<DefaultConsumerContext> = admin_kafka::create_config()
         .create()
         .expect("Consumer creation failed");
@@ -18,11 +18,29 @@ pub async fn list_topics() -> Vec<String> {
                 .iter()
                 .map(|topic| topic.name().to_string())
                 .collect();
-            topics
+            println!("{:?}", topics)
         }
         Err(e) => {
             println!("Error while fetching metadata {:?}", e);
-            return Vec::new();
+        }
+    }
+}
+
+// TODO: fix it later
+pub async fn list_consumer_groups() {
+    let consumer: BaseConsumer<DefaultConsumerContext> = admin_kafka::create_config()
+        .create()
+        .expect("Consumer creation failed");
+
+    let res = consumer.fetch_group_list(None, Some(Duration::from_secs(1)));
+
+    match res {
+        Ok(data) => {
+            let groups = data.groups().iter().map(|info| info.name());
+            println!("{:?}", groups)
+        }
+        Err(e) => {
+            println!("Error while fetching groups {:?}", e)
         }
     }
 }

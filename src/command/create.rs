@@ -1,4 +1,5 @@
 use rdkafka::admin::{AdminOptions, NewTopic};
+use rdkafka::consumer::{Consumer, StreamConsumer};
 
 use crate::admin_kafka;
 
@@ -17,4 +18,31 @@ pub async fn create_topic(topic: NewTopic<'_>) {
             eprintln!("Error while creating the topic {}", e.1);
         }
     }
+}
+
+// TODO: need to check why the creation is not happening
+pub async fn create_consumer_group(group_id: String, topics: &[&str]) {
+    let consumer: StreamConsumer = admin_kafka::create_config()
+        .set("group.id", group_id)
+        .create()
+        .expect("Consumer creation failed");
+
+    let res = consumer.subscribe(topics);
+
+    if let Err(e) = res {
+        println!("Error while subscribing to topics: {:?}", e);
+        return;
+    }
+
+    match consumer.recv().await {
+        Ok(msg) => {
+            println!("Consumer joined the group {:?}", msg)
+        }
+        Err(e) => {
+            println!("Error while consumer is joining the group {:?}", e);
+            return;
+        }
+    }
+
+    println!("Consumer group created and consuming messages.");
 }

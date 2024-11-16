@@ -1,12 +1,15 @@
 use clap::{Parser, Subcommand};
 use cli::config::{
-    create::{CreateCommand, CreateTopicCommands},
+    create::{CreateCommand, CreateCommands},
     delete::{DeleteCommand, DeleteTopicCommands},
-    list::{ListCommand, ListTopicCommands},
+    list::{ListCommand, ListCommands},
 };
-use command::create::create_topic;
 use command::delete::delete_topic;
 use command::list::list_topics;
+use command::{
+    create::{create_consumer_group, create_topic},
+    list::list_consumer_groups,
+};
 use rdkafka::admin::{NewTopic, TopicReplication};
 
 mod admin_kafka;
@@ -32,8 +35,8 @@ async fn main() {
     let args = Cli::parse();
 
     match args.cmd {
-        Commands::Create(topic) => match topic.creat_topic_cmd {
-            CreateTopicCommands::Topic(topic) => {
+        Commands::Create(topic) => match topic.create_cmd {
+            CreateCommands::Topic(topic) => {
                 let name = topic.topic_name;
                 let partition = topic.partition;
                 let replication_factor = TopicReplication::Fixed(topic.replication_factor);
@@ -45,11 +48,17 @@ async fn main() {
                 };
                 create_topic(new_topic).await;
             }
+            CreateCommands::ConsumerGroup(group) => {
+                let slice: Vec<&str> = group.topics.iter().map(|s| s.as_str()).collect();
+                create_consumer_group(group.name, &slice).await
+            }
         },
-        Commands::List(topics) => match topics.list_topic_cmd {
-            ListTopicCommands::Topics => {
-                let topics = list_topics().await;
-                println!("{:?}", topics)
+        Commands::List(topics) => match topics.list_cmd {
+            ListCommands::Topics => {
+                list_topics().await;
+            }
+            ListCommands::ConsumerGroups => {
+                list_consumer_groups().await;
             }
         },
         Commands::Delete(topic) => match topic.delete_topic_cmd {
